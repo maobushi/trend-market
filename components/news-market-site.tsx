@@ -510,10 +510,13 @@ const MarketItem = ({
 				</CardHeader>
 				<CardContent className="py-4">
 					<div className="flex flex-col space-y-2">
-						<div className="flex items-center space-x-2">
+						<div className="flex items-center space-x-2 group relative">
 							<ClockIcon className="w-4 h-4 text-gray-400" />
 							<span className="text-sm text-gray-400">
 								決済時刻: {new Date(deadline * 1000).toLocaleString()}
+							</span>
+							<span className="absolute bottom-full left-0 bg-gray-700 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+								UNIX時間: {deadline}
 							</span>
 						</div>
 						<div className="flex items-center space-x-2">
@@ -585,7 +588,7 @@ export function NewsMarketSite() {
 		<div className="min-h-screen bg-gray-900 text-white">
 			<div className="container mx-auto p-4">
 				<Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-					<TabsList className="grid w-full grid-cols-2 mb-8 bg-gray-800 text-white font-bold">
+					<TabsList className="grid w-full grid-cols-2 mb-8 bg-gray-800 text-white font-bold py-0">
 						<TabsTrigger
 							value="news"
 							className="flex items-center text-lg data-[state=active]:bg-gray-700"

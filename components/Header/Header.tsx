@@ -9,13 +9,16 @@ const Header = () => {
 				</div>
 				<nav className="flex items-center space-x-6">
 					<a href="#" className="hover:text-blue-400 transition-colors">
-						ホーム
+						Home
 					</a>
 					<a href="#" className="hover:text-blue-400 transition-colors">
-						マーケット
+						Markets
 					</a>
-					<a href="#" className="hover:text-blue-400 transition-colors">
-						ポートフォリオ
+					<a
+						href="/portfolio"
+						className="hover:text-blue-400 transition-colors"
+					>
+						Portfolio
 					</a>
 					<w3m-button />
 				</nav>
