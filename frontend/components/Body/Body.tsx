@@ -19,7 +19,7 @@ import {
 	TagIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
+import Header from "@/components/Header/Header";
 // Sample data in JSON format
 const sampleData = {
 	newsItems: [
@@ -581,85 +581,91 @@ const MarketItem = ({
 	</Card>
 );
 
-export function NewsMarketSite() {
+export default function NewsMarketSite() {
 	const [activeTab, setActiveTab] = useState("news");
 
 	return (
-		<div className="min-h-screen bg-gray-900 text-white">
-			<div className="container mx-auto p-4">
-				<Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-					<TabsList className="grid w-full grid-cols-2 mb-8 bg-gray-800 text-white font-bold py-0">
-						<TabsTrigger
-							value="news"
-							className="flex items-center text-lg data-[state=active]:bg-gray-700"
-						>
-							<NewspaperIcon className="w-5 h-5 mr-2 text-white font-bold" />
-							<span className="text-white font-bold">News</span>
-						</TabsTrigger>
-						<TabsTrigger
-							value="markets"
-							className="flex items-center text-lg data-[state=active]:bg-gray-700"
-						>
-							<BarChartIcon className="w-5 h-5 mr-2 text-white font-bold" />
-							<span className="text-white font-bold">Markets</span>
-						</TabsTrigger>
-					</TabsList>
-					<TabsContent value="news">
-						<Card className="bg-gray-800 border-gray-700">
-							<CardHeader>
-								<CardTitle className="text-2xl text-white font-bold">
-									Latest News
-								</CardTitle>
-								<CardDescription className="text-gray-400">
-									Stay informed with the most recent updates
-								</CardDescription>
-							</CardHeader>
-							<CardContent>
-								<ScrollArea className="h-[600px] pr-4">
-									{sampleData.newsItems.map((item) => (
-										<NewsItem
-											key={item.id}
-											title={item.title}
-											description={item.description}
-											provider={item.provider}
-											providerLink={item.providerLink}
-										/>
-									))}
-								</ScrollArea>
-							</CardContent>
-						</Card>
-					</TabsContent>
-					<TabsContent value="markets">
-						<Card className="bg-gray-800 border-gray-700">
-							<CardHeader>
-								<CardTitle className="text-2xl font-bold text-white">
-									Prediction Markets
-								</CardTitle>
-								<CardDescription className="text-gray-400">
-									Explore and bet on future outcomes
-								</CardDescription>
-							</CardHeader>
-							<CardContent>
-								<ScrollArea className="h-[600px] pr-4">
-									{sampleData.marketItems.map((item) => (
-										<MarketItem
-											key={item.id}
-											title={item.title}
-											description={item.description}
-											category={item.category}
-											deadline={item.deadline}
-											yesPrice={item.yesPrice}
-											noPrice={item.noPrice}
-											providers={item.providers}
-											oracles={item.oracles}
-										/>
-									))}
-								</ScrollArea>
-							</CardContent>
-						</Card>
-					</TabsContent>
-				</Tabs>
+		<>
+			<div className="min-h-screen bg-gray-900 text-white">
+				<div className="container mx-auto p-4">
+					<Tabs
+						value={activeTab}
+						onValueChange={setActiveTab}
+						className="w-full"
+					>
+						<TabsList className="grid w-full grid-cols-2 mb-8 bg-gray-800 text-white font-bold py-0">
+							<TabsTrigger
+								value="news"
+								className="flex items-center text-lg data-[state=active]:bg-gray-700"
+							>
+								<NewspaperIcon className="w-5 h-5 mr-2 text-white font-bold" />
+								<span className="text-white font-bold">News</span>
+							</TabsTrigger>
+							<TabsTrigger
+								value="markets"
+								className="flex items-center text-lg data-[state=active]:bg-gray-700"
+							>
+								<BarChartIcon className="w-5 h-5 mr-2 text-white font-bold" />
+								<span className="text-white font-bold">Markets</span>
+							</TabsTrigger>
+						</TabsList>
+						<TabsContent value="news">
+							<Card className="bg-gray-800 border-gray-700">
+								<CardHeader>
+									<CardTitle className="text-2xl text-white font-bold">
+										Latest News
+									</CardTitle>
+									<CardDescription className="text-gray-400">
+										Stay informed with the most recent updates
+									</CardDescription>
+								</CardHeader>
+								<CardContent>
+									<ScrollArea className="h-[600px] pr-4">
+										{sampleData.newsItems.map((item) => (
+											<NewsItem
+												key={item.id}
+												title={item.title}
+												description={item.description}
+												provider={item.provider}
+												providerLink={item.providerLink}
+											/>
+										))}
+									</ScrollArea>
+								</CardContent>
+							</Card>
+						</TabsContent>
+						<TabsContent value="markets">
+							<Card className="bg-gray-800 border-gray-700">
+								<CardHeader>
+									<CardTitle className="text-2xl font-bold text-white">
+										Prediction Markets
+									</CardTitle>
+									<CardDescription className="text-gray-400">
+										Explore and bet on future outcomes
+									</CardDescription>
+								</CardHeader>
+								<CardContent>
+									<ScrollArea className="h-[600px] pr-4">
+										{sampleData.marketItems.map((item) => (
+											<MarketItem
+												key={item.id}
+												title={item.title}
+												description={item.description}
+												category={item.category}
+												deadline={item.deadline}
+												yesPrice={item.yesPrice}
+												noPrice={item.noPrice}
+												providers={item.providers}
+												oracles={item.oracles}
+											/>
+										))}
+									</ScrollArea>
+								</CardContent>
+							</Card>
+						</TabsContent>
+					</Tabs>
+				</div>
 			</div>
-		</div>
+		</>
 	);
 }
