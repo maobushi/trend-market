@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.26;
+pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 contract MockedUSDC is ERC20, Ownable {
     constructor() ERC20("Mocked USDC", "mUSDC") Ownable(msg.sender) {
@@ -31,7 +30,7 @@ contract PredictionToken is ERC20, Ownable {
     }
 }
 
-contract PredictionMarket is ReentrancyGuard, Ownable {
+contract PredictionMarket is Ownable {
     MockedUSDC public usdcToken;
     
     struct Market {
@@ -85,7 +84,7 @@ contract PredictionMarket is ReentrancyGuard, Ownable {
         emit MarketCreated(marketCount, _question, _expirationTime);
     }
 
-    function swap(uint256 _marketId, bool isYes, uint256 amountIn) external nonReentrant returns (uint256 amountOut) {
+    function swap(uint256 _marketId, bool isYes, uint256 amountIn) external returns (uint256 amountOut) {
         Market storage market = markets[_marketId];
         require(!market.resolved, "Market already resolved");
         require(!market.emergencyStopped, "Market is emergency stopped");
@@ -140,7 +139,7 @@ contract PredictionMarket is ReentrancyGuard, Ownable {
         emit EmergencyStop(_marketId);
     }
 
-    function claimRewards(uint256 _marketId) external nonReentrant {
+    function claimRewards(uint256 _marketId) external {
         Market storage market = markets[_marketId];
         require(market.resolved || market.emergencyStopped, "Market not resolved or emergency stopped");
 
