@@ -41,12 +41,7 @@ const Header = () => {
 					>
 						News
 					</a>
-					<a
-						href="/market"
-						className="hover:text-blue-400 transition-colors font-bold"
-					>
-						Market
-					</a>
+
 					<a
 						href="/portfolio"
 						className="hover:text-blue-400 transition-colors font-bold"

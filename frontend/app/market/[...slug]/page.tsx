@@ -32,7 +32,6 @@ export default function Page({ params }: { params: { slug: string } }) {
 		throw new Error("action is not set in environment variables!");
 	}
 
-	const { setOpen } = useIDKit();
 
 	const [isVerified, setIsVerified] = useState(false);
 
@@ -94,38 +93,65 @@ export default function Page({ params }: { params: { slug: string } }) {
 	const [llmOpinions, setLlmOpinions] = useState<
 		Array<{
 			llm: string;
-			opinions: string[];
-			conclusion: "Approve" | "Reject" | "Undecided" | null;
+			opinions: Array<{ text: string; conclusion: "Yes" | "No" | "Undefined" }>;
+			finalConclusion: "Yes" | "No" | "Undefined" | null;
 		}>
 	>([
-		{ llm: "GPT-4", opinions: [], conclusion: null },
-		{ llm: "Claude", opinions: [], conclusion: null },
-		{ llm: "Gemini", opinions: [], conclusion: null },
+		{ llm: "GPT-4", opinions: [], finalConclusion: null },
+		{ llm: "Claude", opinions: [], finalConclusion: null },
+		{ llm: "Gemini", opinions: [], finalConclusion: null },
 	]);
 	const [discussionProgress, setDiscussionProgress] = useState(0);
 	const [isDiscussionExpanded, setIsDiscussionExpanded] = useState(true);
+	const [isDiscussionCompleted, setIsDiscussionCompleted] = useState(false);
 
-	const generateLLMOpinion = (llm: string, round: number) => {
+	const generateLLMOpinion = useCallback((llm: string, round: number) => {
 		const dummyOpinions = {
 			"GPT-4": [
-				"According to the latest report from NewsProviderX, there are rumors of acquisition negotiations between Qualcomm and Intel. However, there has been no official announcement so far. With just over three months left until the end of the year, completing such a large transaction in a short period would be challenging.",
-				"An article reported by Reuters last week states that both Intel and Qualcomm are exploring the possibility of a strategic partnership. However, there is no mention of a full acquisition. It is difficult to see the acquisition being completed within the year.",
-				"According to the latest analysis by TheNewYorkTimes, the semiconductor industry is undergoing reorganization, but there are no specific movements between Intel and Qualcomm. It is premature to predict the acquisition being completed by the end of the year at this point.",
+				{
+					text: "Based on the NewsProviderX report, there are rumors of acquisition talks between Qualcomm and Intel, but no official announcement. Given the short timeframe of just over three months until year-end, completing such a large transaction seems challenging.",
+					conclusion: "No",
+				},
+				{
+					text: "A Reuters article from last week mentions Intel and Qualcomm exploring a strategic partnership, but not a full acquisition. It's unlikely the acquisition would be completed within the year.",
+					conclusion: "No",
+				},
+				{
+					text: "TheNewYorkTimes analysis indicates industry reorganization, but no specific movements between Intel and Qualcomm. Predicting acquisition completion by year-end is premature at this point.",
+					conclusion: "Undefined",
+				},
 			],
 			Claude: [
-				"Qualcomm's stock price is stable, and there have been no significant fluctuations in Intel's stock price either. This suggests that the market does not anticipate a large-scale transaction between the two companies. The possibility of completing the acquisition within the year is low.",
-				"According to the latest information from industry insiders, Intel and Qualcomm appear to be discussing technical cooperation, but there are no specific negotiations regarding an acquisition. Completing the transaction within the year is highly unlikely.",
-				"According to the latest oracle data from Chainlink, there are no Intel and Qualcomm transactions included in the ongoing M&A deals in the semiconductor industry. It is difficult to predict the acquisition being completed by the end of the year at this time.",
+				{
+					text: "Stable stock prices for both Qualcomm and Intel suggest the market doesn't anticipate a large-scale transaction. The likelihood of completing the acquisition within the year is low.",
+					conclusion: "No",
+				},
+				{
+					text: "Industry insider information points to technical cooperation discussions between Intel and Qualcomm, but no specific acquisition negotiations. Completing the transaction within the year is highly improbable.",
+					conclusion: "No",
+				},
+				{
+					text: "Chainlink oracle data shows no Intel and Qualcomm transactions in ongoing semiconductor industry M&A deals. Predicting acquisition completion by year-end is difficult at this time.",
+					conclusion: "Undefined",
+				},
 			],
 			Gemini: [
-				"The latest reports from technology media mention the possibility of collaboration between Intel and Qualcomm, but there is no specific information regarding an acquisition. At this point, the likelihood of completing the transaction within the year is very low.",
-				"According to the latest market analysis from OracleProviderB, the average preparation period for large M&A deals in the semiconductor industry is 12 to 18 months. Given the absence of an official announcement, completing the transaction in the remaining three months is not realistic.",
-				"Looking at recent trends from regulatory authorities, the scrutiny of mergers between large tech companies has become more stringent. Even if negotiations were underway, obtaining approval by the end of the year would be extremely difficult. At this point, the possibility of completing the transaction within the year is very low.",
+				{
+					text: "Technology media reports mention potential collaboration between Intel and Qualcomm, but no specific acquisition information. The probability of completing the transaction within the year is very low.",
+					conclusion: "No",
+				},
+				{
+					text: "OracleProviderB's market analysis indicates a 12-18 month average preparation period for large semiconductor M&A deals. Without an official announcement, completing the transaction in three months is unrealistic.",
+					conclusion: "No",
+				},
+				{
+					text: "Recent regulatory trends show increased scrutiny of large tech company mergers. Even if negotiations were ongoing, obtaining approval by year-end would be extremely challenging. The possibility of completing the transaction within the year is very low.",
+					conclusion: "No",
+				},
 			],
 		};
-
 		return dummyOpinions[llm as keyof typeof dummyOpinions][round];
-	};
+	}, []);
 
 	const advanceDiscussion = useCallback(() => {
 		setDiscussionProgress((prevProgress) => {
@@ -135,7 +161,7 @@ export default function Page({ params }: { params: { slug: string } }) {
 					const round = Math.floor(prevProgress / 3);
 					if (prevProgress % 3 === 0) {
 						const newOpinion = generateLLMOpinion(llm.llm, round);
-						console.log(`${llm.llm} - Round ${round + 1}: ${newOpinion}`);
+						console.log(`${llm.llm} - Round ${round + 1}: ${newOpinion.text}`);
 						return {
 							...llm,
 							opinions: [...llm.opinions, newOpinion],
@@ -147,23 +173,27 @@ export default function Page({ params }: { params: { slug: string } }) {
 				return prevProgress + 1;
 			} else if (prevProgress === 9) {
 				const finalOpinions = llmOpinions.map((llm) => {
-					const approveCount = llm.opinions.filter((op) =>
-						op.includes("Approve")
+					const yesCount = llm.opinions.filter(
+						(op) => op.conclusion === "Yes"
 					).length;
-					const rejectCount = llm.opinions.filter((op) =>
-						op.includes("Reject")
+					const noCount = llm.opinions.filter(
+						(op) => op.conclusion === "No"
 					).length;
-					let conclusion: "Approve" | "Reject" | "Undecided" = "Undecided";
+					const undefinedCount = llm.opinions.filter(
+						(op) => op.conclusion === "Undefined"
+					).length;
 
-					if (approveCount > rejectCount) {
-						conclusion = "Approve";
-					} else if (rejectCount > approveCount) {
-						conclusion = "Reject";
+					let finalConclusion: "Yes" | "No" | "Undefined" = "Undefined";
+
+					if (yesCount > noCount && yesCount > undefinedCount) {
+						finalConclusion = "Yes";
+					} else if (noCount > yesCount && noCount > undefinedCount) {
+						finalConclusion = "No";
 					}
 
 					return {
 						...llm,
-						conclusion: conclusion,
+						finalConclusion: finalConclusion,
 					};
 				});
 				setLlmOpinions(finalOpinions);
@@ -177,12 +207,14 @@ export default function Page({ params }: { params: { slug: string } }) {
 	useEffect(() => {
 		const timer = setInterval(() => {
 			advanceDiscussion();
-		}, 5000); // Advance every 5 seconds
+		}, 2000); // Advance every 2 seconds
 
 		return () => clearInterval(timer);
 	}, [advanceDiscussion]);
 
 	const handleVote = (vote: "yes" | "no") => {
+		if (!isDiscussionCompleted) return; // Ignore votes until discussion is completed
+
 		setMarketData((prevData) => {
 			const change = 0.01; // 1% change
 			let newYesPrice = prevData.yesPrice;
@@ -212,20 +244,20 @@ export default function Page({ params }: { params: { slug: string } }) {
 
 	const calculateMajorityVote = () => {
 		const votes = llmOpinions
-			.map((llm) => llm.conclusion)
-			.filter((vote) => vote !== null);
-		if (votes.length === 0) return "Undecided";
+			.map((llm) => llm.finalConclusion)
+			.filter((vote): vote is "Yes" | "No" | "Undefined" => vote !== null);
+		if (votes.length === 0) return "Undefined";
 
 		const voteCount = votes.reduce((acc, vote) => {
 			acc[vote] = (acc[vote] || 0) + 1;
-			return acc as Record<string, number>;
-		}, {} as Record<string, number>);
+			return acc;
+		}, {} as Record<"Yes" | "No" | "Undefined", number>);
 
 		const maxVotes = Math.max(...Object.values(voteCount));
 		const winners = Object.entries(voteCount)
 			.filter(([_, count]) => count === maxVotes)
 			.map(([vote]) => vote);
-		return winners.length > 1 ? "Undecided" : winners[0];
+		return winners.length > 1 ? "Undefined" : winners[0];
 	};
 
 	const {
@@ -254,6 +286,22 @@ export default function Page({ params }: { params: { slug: string } }) {
 			alert("コメントを投稿するにはWorld IDで認証してください。");
 		}
 	};
+
+	useEffect(() => {
+		if (discussionProgress === 10) {
+			setIsDiscussionCompleted(true);
+			const majorityVote = calculateMajorityVote();
+			if (majorityVote === "Yes" || majorityVote === "No") {
+				setMarketData((prevData) => ({
+					...prevData,
+					yesPrice: majorityVote === "Yes" ? 1 : 0,
+					noPrice: majorityVote === "No" ? 1 : 0,
+					yesPercentage: majorityVote === "Yes" ? 100 : 0,
+					noPercentage: majorityVote === "No" ? 100 : 0,
+				}));
+			}
+		}
+	}, [discussionProgress]);
 
 	return (
 		<>
@@ -328,6 +376,7 @@ export default function Page({ params }: { params: { slug: string } }) {
 											variant="outline"
 											className="w-full justify-between bg-green-900 hover:bg-green-800 border-green-700 text-white font-bold"
 											onClick={() => handleVote("yes")}
+											disabled={!isDiscussionCompleted}
 										>
 											Yes{" "}
 											<span className="ml-1 text-green-400">
@@ -339,6 +388,7 @@ export default function Page({ params }: { params: { slug: string } }) {
 											variant="outline"
 											className="w-full justify-between bg-red-900 hover:bg-red-800 border-red-700 text-white font-bold"
 											onClick={() => handleVote("no")}
+											disabled={!isDiscussionCompleted}
 										>
 											No{" "}
 											<span className="ml-1 text-red-400">
@@ -432,7 +482,7 @@ export default function Page({ params }: { params: { slug: string } }) {
 																</div>
 																<div className="flex-1 text-white">
 																	<p className="text-md">
-																		{llm.opinions[round]}
+																		{llm.opinions[round].text}
 																	</p>
 																</div>
 															</motion.div>
@@ -469,14 +519,14 @@ export default function Page({ params }: { params: { slug: string } }) {
 									</h3>
 									<p
 										className={`text-lg font-bold ${
-											llm.conclusion === "Approve"
+											llm.finalConclusion === "Yes"
 												? "text-green-400"
-												: llm.conclusion === "Reject"
+												: llm.finalConclusion === "No"
 												? "text-red-400"
 												: "text-yellow-400"
 										}`}
 									>
-										{llm.conclusion}
+										{llm.finalConclusion}
 									</p>
 								</motion.div>
 							))}
@@ -504,7 +554,7 @@ export default function Page({ params }: { params: { slug: string } }) {
 					<Card className="bg-gray-800 border-gray-700">
 						<CardHeader>
 							<CardTitle className="text-2xl font-bold text-white">
-								コメント
+								Comments
 							</CardTitle>
 						</CardHeader>
 						<CardContent>
@@ -518,7 +568,7 @@ export default function Page({ params }: { params: { slug: string } }) {
 							<div className="mt-4 flex space-x-2">
 								<Input
 									type="text"
-									placeholder="コメントを入力..."
+									placeholder="Input your comment..."
 									value={newComment}
 									onChange={(e) => setNewComment(e.target.value)}
 									className="flex-grow bg-gray-700 text-white"

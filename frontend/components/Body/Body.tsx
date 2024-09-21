@@ -24,10 +24,11 @@ export const sampleData = {
 	marketItems: [
 		{
 			id: 1,
-			title: "90日以内にヒズボラがイスラエルに大規模報復攻撃を行うか？",
+			title:
+				"Will Hezbollah launch a large-scale retaliatory attack against Israel within 90 days?",
 			description:
-				"ヒズボラ指導者ハッサン・ナスラッラーが報復を誓った後、イスラエルがレバノンを爆撃。この緊張状態を受け、ヒズボラによる大規模な報復攻撃（100発以上のロケット弾発射または10人以上の死者を出す攻撃）が行われるかを予測。",
-			category: "政治・国際情勢",
+				"After Hezbollah leader Hassan Nasrallah vowed retaliation, Israel bombed Lebanon. Given this tense situation, predict whether Hezbollah will carry out a large-scale retaliatory attack (firing over 100 rockets or an attack resulting in more than 10 casualties).",
+			category: "Politics & International Affairs",
 			deadline: 1701388800,
 			yesPrice: 0.65,
 			noPrice: 0.35,
@@ -60,10 +61,10 @@ export const sampleData = {
 		},
 		{
 			id: 2,
-			title: "2024年末までにS&P500が5000ポイントを超えるか？",
+			title: "Will the S&P500 exceed 5000 points by the end of 2024?",
 			description:
-				"連邦準備制度理事会（FRB）の大幅利下げを受け、S&P500が過去最高値を更新。この勢いが続き、2024年12月31日まで S&P500 が 5000 ポイントを超えるかどうかを予測。",
-			category: "経済・金融",
+				"Following a significant rate cut by the Federal Reserve, the S&P500 has reached a new all-time high. Predict whether this momentum will continue and the S&P500 will exceed 5000 points by December 31, 2024.",
+			category: "Economy & Finance",
 			deadline: 1735689600,
 			yesPrice: 0.55,
 			noPrice: 0.45,
@@ -96,10 +97,11 @@ export const sampleData = {
 		},
 		{
 			id: 3,
-			title: "60日以内にNorth Carolina州知事候補のMark Robinsonが辞退するか？",
+			title:
+				"Will North Carolina gubernatorial candidate Mark Robinson withdraw within 60 days?",
 			description:
-				"Mark Robinson氏が過去に「黒人ナチ」を自称し、奴隷制を擁護したとする報道を受け、共和党候補者としての地位が揺らいでいる。60日以内に彼が州知事選から辞退するかを予測。",
-			category: "政治",
+				"Mark Robinson's position as a Republican candidate is in jeopardy following reports that he previously called himself a 'black Nazi' and defended slavery. Predict whether he will withdraw from the gubernatorial race within 60 days.",
+			category: "Politics",
 			deadline: 1700784000,
 			yesPrice: 0.7,
 			noPrice: 0.3,
@@ -132,10 +134,11 @@ export const sampleData = {
 		},
 		{
 			id: 4,
-			title: "6ヶ月以内にバイデン大統領の支持率が45%を超えるか？",
+			title:
+				"Will President Biden's approval rating exceed 45% within 6 months?",
 			description:
-				"North Carolina州知事選の混乱や中東情勢の緊迫化など、様々な政治的要因がバイデン大統領の支持率に影響を与える可能性がある。今後6ヶ月以内に、信頼できる全国世論調査でバイデン大統領の支持率が45%を超えるかを予測。",
-			category: "政治",
+				"Various political factors, such as the turmoil in the North Carolina gubernatorial race and the tense situation in the Middle East, may affect President Biden's approval rating. Predict whether President Biden's approval rating will exceed 45% in a reliable national poll within the next 6 months.",
+			category: "Politics",
 			deadline: 1710720000,
 			yesPrice: 0.4,
 			noPrice: 0.6,
@@ -168,10 +171,11 @@ export const sampleData = {
 		},
 		{
 			id: 5,
-			title: "1以内にNASAが過去100万年で最高気温を記録したと発表するか？",
+			title:
+				"Will NASA announce the highest global average temperature in the past million years within 1 year?",
 			description:
-				"先史時代の地球が非常に高温だったという新しい研究結果を踏まえ今後1年以内にNASAが過去100万年で最高の全球平均気温を記録したと公式に発表するかどうかを予測。",
-			category: "科学・環境",
+				"Based on new research suggesting that prehistoric Earth was extremely hot, predict whether NASA will officially announce the highest global average temperature in the past million years within the next year.",
+			category: "Science & Environment",
 			deadline: 1726790400,
 			yesPrice: 0.75,
 			noPrice: 0.25,
@@ -205,7 +209,7 @@ export const sampleData = {
 	],
 };
 
-// プロバ��ダーアイコンのコンポーネント
+// プロバダーアイコンのコンポーネント
 export const ProviderIcon = ({
 	provider,
 	link,
@@ -316,10 +320,10 @@ export default function NewsMarketSite() {
 	};
 
 	const newsCategories = [
-		{ value: "all", label: "すべて", icon: NewspaperIcon },
-		{ value: "Politics", label: "政治", icon: UsersIcon },
-		{ value: "Business", label: "ビジネス", icon: DollarSignIcon },
-		{ value: "Technology", label: "テクノロジー", icon: TagIcon },
+		{ value: "all", label: "All", icon: NewspaperIcon },
+		{ value: "Politics", label: "Politics", icon: UsersIcon },
+		{ value: "Business", label: "Business", icon: DollarSignIcon },
+		{ value: "Technology", label: "Technology", icon: TagIcon },
 	];
 
 	const filteredNews =
@@ -363,7 +367,7 @@ export default function NewsMarketSite() {
 												<TabsTrigger
 													key={category.value}
 													value={category.value}
-													className="flex items-center text-sm data-[state=active]:bg-gray-600"
+													className="flex items-center text-sm text-white data-[state=active]:bg-gray-600"
 												>
 													<category.icon className="w-4 h-4 mr-2" />
 													<span>{category.label}</span>
