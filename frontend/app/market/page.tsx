@@ -1,153 +1,141 @@
 "use client";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
-import { ProviderIcon } from "@/components/Body/Body";
-import { ClockIcon, UsersIcon, DollarSignIcon, TagIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-// マーケット項目のコンポーネント
-import { sampleData } from "@/components/Body/Body";
+import React, { useState } from "react";
 import Header from "@/components/Header/Header";
+import { ethers } from "ethers";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-export function MarketItem({
-	title,
-	description,
-	category,
-	deadline,
-	yesPrice,
-	noPrice,
-	providers,
-	oracles,
-}: {
-	title: string;
-	description: string;
-	category: string;
-	deadline: number;
-	yesPrice: number;
-	noPrice: number;
-	providers: { name: string; link: string; iconPath: string }[];
-	oracles: { name: string; link: string; iconPath: string }[];
-}) {
-	return (
-		<Card className="mb-6 bg-gray-800 border-gray-700">
-			<div className="flex flex-col sm:flex-row">
-				<div className="flex-grow sm:w-2/3">
-					<CardHeader className="flex flex-col space-y-1.5">
-						<CardTitle className="text-xl font-bold text-white">
-							{title}
-						</CardTitle>
-						<CardDescription className="text-gray-400">
-							{description}
-						</CardDescription>
-					</CardHeader>
-					<CardContent className="py-4">
-						<div className="flex flex-col space-y-2">
-							<div className="flex items-center space-x-2 group relative">
-								<ClockIcon className="w-4 h-4 text-gray-400" />
-								<span className="text-sm text-gray-400">
-									決済時刻: {new Date(deadline * 1000).toLocaleString()}
-								</span>
-								<span className="absolute bottom-full left-0 bg-gray-700 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-									UNIX時間: {deadline}
-								</span>
-							</div>
-							<div className="flex items-center space-x-2">
-								<TagIcon className="w-4 h-4 text-gray-400" />
-								<span className="text-sm text-gray-400">
-									カテゴリ: {category}
-								</span>
-							</div>
-							<div className="flex items-center space-x-2">
-								<UsersIcon className="w-4 h-4 text-gray-400" />
-								<span className="text-sm text-gray-400">参加人数: 1,234</span>
-							</div>
-							<div className="flex items-center space-x-2">
-								<DollarSignIcon className="w-4 h-4 text-gray-400" />
-								<span className="text-sm text-gray-400">Volume: $10,000</span>
-							</div>
-						</div>
-					</CardContent>
-				</div>
-				<div className="flex flex-col justify-between p-4 sm:w-1/3">
-					<div className="flex flex-col space-y-2 mb-4">
-						<Button
-							variant="outline"
-							className="w-full justify-between bg-green-900 hover:bg-green-800 border-green-700 text-white font-bold"
-						>
-							Yes{" "}
-							<span className="ml-1 text-green-400">
-								${yesPrice.toFixed(2)}
-							</span>
-						</Button>
-						<Button
-							variant="outline"
-							className="w-full justify-between bg-red-900 hover:bg-red-800 border-red-700 text-white font-bold"
-						>
-							No{" "}
-							<span className="ml-1 text-red-400">${noPrice.toFixed(2)}</span>
-						</Button>
-					</div>
-					<div className="flex flex-col space-y-2">
-						<div className="flex flex-wrap gap-1">
-							<span className="text-sm text-gray-400 mr-2">News Provider:</span>
-							{providers.map((provider, index) => (
-								<ProviderIcon
-									key={`provider-${index}`}
-									provider={provider.name}
-									link={provider.link}
-									iconPath={provider.iconPath}
-								/>
-							))}
-						</div>
-						<div className="flex flex-wrap gap-1">
-							<span className="text-sm text-gray-400 mr-2">Oracle:</span>
-							{oracles.map((oracle, index) => (
-								<ProviderIcon
-									key={`oracle-${index}`}
-									provider={oracle.name}
-									link={oracle.link}
-									iconPath={oracle.iconPath}
-								/>
-							))}
-						</div>
-					</div>
-				</div>
-			</div>
-		</Card>
-	);
-}
+import {
+	PREDICTION_MARKET_ADDRESS,
+	PREDICTION_MARKET_ABI,
+	MOCKED_USDC_ADDRESS,
+	MOCKED_USDC_ABI,
+} from "@/lib/ABI";
+const PredictionMarketCreator = () => {
+	const [question, setQuestion] = useState("");
+	const [expirationTime, setExpirationTime] = useState("");
+	const [initialLiquidity, setInitialLiquidity] = useState("");
+	const [status, setStatus] = useState("");
 
-export default function Market() {
+	const provider = new ethers.providers.Web3Provider(window?.ethereum as any);
+
+	const handleCreateMarket = async () => {
+		if (!provider) {
+			setStatus("ウォレットを先に接続してください。");
+			return;
+		}
+
+		try {
+			const signer = provider.getSigner();
+			const contract = new ethers.Contract(
+				PREDICTION_MARKET_ADDRESS,
+				PREDICTION_MARKET_ABI,
+				signer
+			);
+
+			// 有効な日時文字列であることを確認
+			if (isNaN(Date.parse(expirationTime))) {
+				throw new Error("無効な日時形式です。");
+			}
+
+			const expirationTimestamp = Math.floor(
+				new Date(expirationTime).getTime() / 1000
+			);
+			const liquidityInWei = ethers.utils.parseUnits(initialLiquidity, 6);
+
+			// USDCの承認（必要な場合）
+			const usdcContract = new ethers.Contract(
+				MOCKED_USDC_ADDRESS,
+				MOCKED_USDC_ABI,
+				signer
+			);
+			const approveTx = await usdcContract.approve(
+				PREDICTION_MARKET_ADDRESS,
+				liquidityInWei
+			);
+			await approveTx.wait();
+
+			// ガス制限を手動で設定
+			const gasLimit = await contract.estimateGas
+				.createMarket(question, expirationTimestamp, liquidityInWei)
+				.catch((error) => {
+					console.error("ガス見積もりエラー:", error);
+					return ethers.BigNumber.from(1000000); // フォールバックのガス制限を増やす
+				});
+
+			const tx = await contract.createMarket(
+				question,
+				expirationTimestamp,
+				liquidityInWei,
+				{ gasLimit: gasLimit.mul(150).div(100) } // 50%のバッファを追加
+			);
+			setStatus("トランザクションを送信しました。確認を待っています...");
+
+			const receipt = await tx.wait();
+			if (receipt.status === 0) {
+				throw new Error("トランザクションが失敗しました。");
+			}
+			setStatus("マーケットが正常に作成されました！");
+		} catch (error) {
+			console.error("詳細なエラー:", error);
+			setStatus(`エラー: ${error.message}`);
+		}
+	};
+
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white">
+		<>
 			<Header />
-			<div className="container mx-auto p-8">
-				<h1 className="text-4xl font-bold mb-8">Market</h1>
-				<div className="flex flex-col md:flex-row gap-8">
-					<div className="flex-1 bg-gray-800 rounded-lg p-6 shadow-lg">
-						<h2 className="text-2xl mb-4">参加中のマーケット</h2>
-						<div className="space-y-4">
-							{sampleData.marketItems.map((item) => (
-								<MarketItem
-									key={item.id}
-									title={item.title}
-									description={item.description}
-									category={item.category}
-									deadline={item.deadline}
-									yesPrice={item.yesPrice}
-									noPrice={item.noPrice}
-									providers={item.providers}
-									oracles={item.oracles}
-								/>
-							))}
-						</div>
+			<div className="p-4 max-w-md mx-auto bg-white rounded-xl shadow-md">
+				<h2 className="text-2xl font-bold mb-4">Create Prediction Market</h2>
+				<div className="space-y-4">
+					<div>
+						<label className="block text-sm font-medium text-gray-700">
+							Question
+						</label>
+						<input
+							type="text"
+							value={question}
+							onChange={(e) => setQuestion(e.target.value)}
+							className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+						/>
 					</div>
+					<div>
+						<label className="block text-sm font-medium text-gray-700">
+							Expiration Time
+						</label>
+						<input
+							type="datetime-local"
+							value={expirationTime}
+							onChange={(e) => setExpirationTime(e.target.value)}
+							className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+						/>
+					</div>
+					<div>
+						<label className="block text-sm font-medium text-gray-700">
+							Initial Liquidity (USDC)
+						</label>
+						<input
+							type="number"
+							value={initialLiquidity}
+							onChange={(e) => setInitialLiquidity(e.target.value)}
+							className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+						/>
+					</div>
+					<button
+						onClick={handleCreateMarket}
+						className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+					>
+						Create Market
+					</button>
 				</div>
+				{status && (
+					<Alert className="mt-4">
+						<AlertTitle>Status</AlertTitle>
+						<AlertDescription>{status}</AlertDescription>
+					</Alert>
+				)}
 			</div>
-		</div>
+		</>
 	);
-}
+};
+
+export default PredictionMarketCreator;

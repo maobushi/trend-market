@@ -1,5 +1,6 @@
-export const USDTAddress = "0x6187d42265184Cc098AAC7D08aF6c1Dfae0877F2";
-export const USDCAbi = [
+export const MOCKED_USDC_ADDRESS = "0x6187d42265184Cc098AAC7D08aF6c1Dfae0877F2";
+
+export const MOCKED_USDC_ABI = [
 	{
 		type: "function",
 		name: "allowance",
@@ -165,8 +166,10 @@ export const USDCAbi = [
 		inputs: [{ name: "spender", type: "address", internalType: "address" }],
 	},
 ];
-
-export const MarketAbi = [
+export const PREDICTION_MARKET_ADDRESS =
+	"0x55E02Dcc8c1759466f906Bb3136C9218D2DA8c49";
+export const INITIAL_LIQUIDITY = 1000000000000000000000000;
+export const PREDICTION_MARKET_ABI = [
 	{
 		type: "constructor",
 		inputs: [{ name: "_usdcToken", type: "address", internalType: "address" }],

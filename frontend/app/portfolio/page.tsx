@@ -32,22 +32,27 @@ const Portfolio = () => {
 
 	const claimMUSDC = async () => {
 		if (primaryWallet?.address) {
-			const provider = new ethers.providers.Web3Provider(
-				window?.ethereum as any
-			);
-			const signer = provider.getSigner();
-			const contract = new ethers.Contract(tokenAddress, ERC20_ABI, signer);
-
 			try {
+				const provider = new ethers.providers.Web3Provider(
+					window?.ethereum as any
+				);
+				await provider.send("eth_requestAccounts", []); // ウォレット接続を要求
+				const signer = provider.getSigner();
+				const contract = new ethers.Contract(tokenAddress, ERC20_ABI, signer);
+
 				const amount = "100";
 				const tx = await contract.mint(primaryWallet.address, amount);
 				await tx.wait();
-				alert("100 mUSDC minted successfully!");
+				alert("100 mUSDCが正常にミントされました！");
 				fetchBalance();
 			} catch (error) {
-				console.error("mUSDC minting failed:", error);
-				alert("mUSDC minting failed.");
+				console.error("mUSDCのミントに失敗しました:", error);
+				alert(
+					"mUSDCのミントに失敗しました。ウォレットが接続されていることを確認してください。"
+				);
 			}
+		} else {
+			alert("ウォレットが接続されていません。");
 		}
 	};
 
