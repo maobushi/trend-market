@@ -39,8 +39,9 @@ const MarketGenerator: React.FC<MarketGeneratorProps> = ({
 	published_at,
 	category,
 }) => {
+	const [isGenerating, setIsGenerating] = useState(false);
+	const [isDeploying, setIsDeploying] = useState(false);
 	const [markets, setMarkets] = useState<MarketItem[]>([]);
-	const [isLoading, setIsLoading] = useState(false);
 	const [feeTxHash, setFeeTxHash] = useState("");
 	const [deployTxHash, setDeployTxHash] = useState("");
 	const { primaryWallet, network } = useDynamicContext();
@@ -60,48 +61,48 @@ const MarketGenerator: React.FC<MarketGeneratorProps> = ({
 		signer
 	);
 	const generateMarkets = async () => {
-		setIsLoading(true);
+		setIsGenerating(true);
 		setError(null);
 		try {
 			if (!primaryWallet || !isEthereumWallet(primaryWallet)) {
-				throw new Error("有効なEthereumウォレットが接続されていません。");
+				throw new Error("A valid Ethereum wallet is not connected.");
 			}
 
 			const walletClient = await primaryWallet.getWalletClient();
 			if (!walletClient) {
-				throw new Error("ウォレットクライアントの取得に失敗しました。");
+				throw new Error("Failed to retrieve wallet client.");
 			}
 
 			const publicClient = await primaryWallet.getPublicClient();
 			if (!publicClient) {
-				throw new Error("パブリッククライアントの取得に失敗しました。");
+				throw new Error("Failed to retrieve public client.");
 			}
 
-			// ネットワークの確認
+			// Verify network
 			const chainId = await walletClient.getChainId();
 			if (chainId !== 11155111) {
-				// SepoliaのチェーンID
-				throw new Error("SepoliaテストネットワークにSwitchしてください。");
+				// Sepolia chain ID
+				throw new Error("Please switch to the Sepolia test network.");
 			}
 
 			const transaction = {
 				to: "0x73C4a0309E1955074fF5728c0f196b8F295a952d",
-				value: parseUnits("0.01", 6), // mUSDCは6桁の精度を持つと仮定
-				chain: { id: chainId }, // チェーン情報を追加
+				value: parseUnits("0.01", 6), // Assuming mUSDC has 6 decimal places
+				chain: { id: chainId }, // Add chain information
 			};
 
 			const hash = await walletClient.sendTransaction(transaction);
 			setFeeTxHash(hash);
 
-			// トランザクションの確認を待つ
+			// Wait for transaction confirmation
 			const receipt = await publicClient.waitForTransactionReceipt({
 				hash,
-				timeout: 60_000, // 60秒のタイムアウト
+				timeout: 60_000, // 60 seconds timeout
 			});
 
 			console.log("Transaction receipt:", receipt);
 
-			// ここでバックエンドAPIを呼び出し、LLMを使用してマーケットを生成します
+			// Call backend API to generate markets using LLM
 			const response = await fetch("/api/llm", {
 				method: "POST",
 				headers: {
@@ -188,11 +189,11 @@ const MarketGenerator: React.FC<MarketGeneratorProps> = ({
 			});
 			const data = await response.json();
 
-			console.log("API response:", data); // デバッグ用
+			console.log("API response:", data); // For debugging
 
 			if (data.message && data.message.content) {
 				try {
-					// JSONデータをクリーンアップして解析
+					// Clean up JSON data and parse
 					const cleanedContent = data.message.content.trim();
 					const parsedMarkets = JSON.parse(
 						`[${cleanedContent.replace(/}\s*{/g, "},{")}]`
@@ -213,69 +214,69 @@ const MarketGenerator: React.FC<MarketGeneratorProps> = ({
 				setMarkets([]);
 			}
 		} catch (error) {
-			console.error("マーケット生成中にエラーが発生しました:", error);
+			console.error("Error occurred while generating markets:", error);
 			setMarkets([]);
 			setError(
-				error instanceof Error ? error.message : "不明なエラーが発生しました。"
+				error instanceof Error ? error.message : "An unknown error occurred."
 			);
 		} finally {
-			setIsLoading(false);
+			setIsGenerating(false);
 		}
 	};
 
 	const deployMarket = async () => {
-		setIsLoading(true);
+		setIsDeploying(true);
 		setError(null);
 		try {
 			if (!primaryWallet || !isEthereumWallet(primaryWallet)) {
-				throw new Error("有効なEthereumウォレットが接続されていません。");
+				throw new Error("A valid Ethereum wallet is not connected.");
 			}
 
 			const walletClient = await primaryWallet.getWalletClient();
 			if (!walletClient) {
-				throw new Error("ウォレットクライアントの取得に失敗しました。");
+				throw new Error("Failed to retrieve wallet client.");
 			}
 
-			// ネットワークの確認
+			// Verify network
 			const chainId = await walletClient.getChainId();
 			if (chainId !== 11155111) {
-				// SepoliaのチェーンID
-				throw new Error("SepoliaテストネットワークにSwitchしてください。");
+				// Sepolia chain ID
+				throw new Error("Please switch to the Sepolia test network.");
 			}
 
-			// markets が空の場合はエラーを投げる
+			// Throw error if markets are empty
 			if (!markets || markets.length === 0) {
 				throw new Error(
-					"マーケットが生成されていません。先にマーケットを生成してください。"
+					"Markets have not been generated. Please generate markets first."
 				);
 			}
 
-			// 最初のマーケットを使用
+			// Use the first market
 			const marketToDeploy = markets[0];
 
-			// ス���ートコントラクトのアドレスとABIを設定
-			const contractAddress = PREDICTION_MARKET_ADDRESS; // デプロイされたコントラクトのアドレス
+			// Set smart contract address and ABI
+			const contractAddress = PREDICTION_MARKET_ADDRESS; // Deployed contract address
 			const contractABI = PREDICTION_MARKET_ABI;
 
-			// コントラクトインスタンスの作成
+			// Create contract instance
 			const contract = new ethers.Contract(
 				contractAddress,
 				contractABI,
 				signer
 			);
 
-			// deadlineを計算（例：現在から30日後）
+			// Calculate deadline (e.g., 30 days from now)
 			const deadline = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60;
 
-			// initialLiquidityを固定値として設定（例：100）
+			// Set initialLiquidity to a fixed value (e.g., 100)
 			const initialLiquidity = 100;
-			console.log("マーケットのデプロイis");
+			console.log("Deploying market");
 			console.log(marketToDeploy);
 
-			// ガス制限をさらに増やす
-			const gasLimit = 2000000; // 1000000から2000000に増加
+			// Increase gas limit
+			const gasLimit = 2000000; // Increased from 1000000 to 2000000
 
-			// マーケットのデプロイ
+			// Deploy the market
 			const tx = await contract.createMarket(
 				marketToDeploy.title,
 				deadline,
@@ -283,57 +284,57 @@ const MarketGenerator: React.FC<MarketGeneratorProps> = ({
 				{ gasLimit: gasLimit }
 			);
 
-			// トランザクションの詳細をログに出力
-			console.log("トランザクション詳細:", tx);
+			// Log transaction details
+			console.log("Transaction details:", tx);
 
 			setDeployTxHash(tx.hash);
 
-			// トランザクションの確認を待つ
+			// Wait for transaction confirmation
 			const receipt = await tx.wait();
 
-			// レシートの詳細をログに出力
-			console.log("トランザクションレシート:", receipt);
+			// Log receipt details
+			console.log("Transaction receipt:", receipt);
 
 			if (receipt.status === 0) {
-				throw new Error("トランザクションが失敗しました。");
+				throw new Error("Transaction failed.");
 			}
 
-			console.log("マーケットが正常にデプロイされました");
-			setDeployedMarketIndex(0); // 最初のマーケットがデプロイされたことを記録
+			console.log("Market deployed successfully");
+			setDeployedMarketIndex(0); // Record that the first market has been deployed
 		} catch (error) {
-			console.error("マーケットのデプロイ中にエラーが発生しました:", error);
-			// エラーの詳細情報を取得
+			console.error("Error occurred while deploying market:", error);
+			// Retrieve detailed error information
 			if (error.transaction) {
-				console.error("トランザクション詳細:", error.transaction);
+				console.error("Transaction details:", error.transaction);
 			}
 			if (error.receipt) {
-				console.error("レシート詳細:", error.receipt);
+				console.error("Receipt details:", error.receipt);
 			}
 			setError(
-				error instanceof Error ? error.message : "不明なエラーが発生しました。"
+				error instanceof Error ? error.message : "An unknown error occurred."
 			);
 		} finally {
-			setIsLoading(false);
+			setIsDeploying(false);
 		}
 	};
 
 	return (
 		<div className="bg-gray-900 shadow-2xl rounded-lg overflow-hidden border border-gray-700 p-8">
-			<h2 className="text-3xl font-bold mb-6 text-white">マーケットを生成</h2>
+			<h2 className="text-3xl font-bold mb-6 text-white">Generate Market</h2>
 			<div className="flex space-x-4 mb-6">
 				<button
 					onClick={generateMarkets}
-					disabled={isLoading}
+					disabled={isGenerating || isDeploying}
 					className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 ease-in-out flex-1"
 				>
-					{isLoading ? "生成中..." : "マーケットを生成"}
+					{isGenerating ? "Generating..." : "Generate Market"}
 				</button>
 				<button
 					onClick={deployMarket}
-					disabled={isLoading || !markets.length}
+					disabled={isDeploying || isGenerating || !markets.length}
 					className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 ease-in-out flex-1"
 				>
-					{isLoading ? "デプロイ中..." : "マーケットをデプロイ"}
+					{isDeploying ? "Deploying..." : "Deploy Market"}
 				</button>
 			</div>
 			{error && (
@@ -344,11 +345,11 @@ const MarketGenerator: React.FC<MarketGeneratorProps> = ({
 			{(feeTxHash || deployTxHash) && (
 				<div className="mt-6 bg-gray-800 rounded-lg p-4">
 					<h3 className="text-xl font-semibold mb-3 text-white">
-						トランザクション情報:
+						Transaction Information:
 					</h3>
 					{feeTxHash && (
 						<p className="text-green-400 mb-2">
-							Fee支払い:{" "}
+							Fee Payment:{" "}
 							<a
 								href={`https://sepolia.etherscan.io/tx/${feeTxHash}`}
 								target="_blank"
@@ -361,7 +362,7 @@ const MarketGenerator: React.FC<MarketGeneratorProps> = ({
 					)}
 					{deployTxHash && (
 						<p className="text-blue-400">
-							マーケットデプロイ:{" "}
+							Market Deployment:{" "}
 							<a
 								href={`https://sepolia.etherscan.io/tx/${deployTxHash}`}
 								target="_blank"
@@ -377,7 +378,7 @@ const MarketGenerator: React.FC<MarketGeneratorProps> = ({
 			{markets && markets.length > 0 && (
 				<div className="mt-6">
 					<h3 className="text-xl font-semibold mb-2 text-white">
-						生成されたマーケット:
+						Generated Markets:
 					</h3>
 					<ul className="list-disc list-inside">
 						{markets.map((market, index) => (

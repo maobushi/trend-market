@@ -9,8 +9,7 @@ import {
 } from "@/components/ui/card";
 import { ClockIcon, UsersIcon, DollarSignIcon, TagIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import DeployMarket from "@/components/MarketGenerator/DeployMarket";
-
+import Link from "next/link";
 interface MarketItemProps {
 	contract_id?: number;
 	title: string;
@@ -46,7 +45,19 @@ export const MarketItem: React.FC<MarketItemProps> = ({
 	const noPercentage = 100 - yesPercentage;
 
 	return (
-		<Card className="mb-6 bg-gray-800 border-gray-700">
+		<Card className="mb-6 bg-gray-800 border-gray-700 relative">
+			<Link href={`/market/${contract_id}`}>
+				<div className="absolute bottom-2 right-2 p-2">
+					<Button
+						variant="outline"
+						size="icon"
+						className="w-8 h-8 rounded-full bg-blue-600 hover:bg-blue-700 border-blue-500"
+						title="Execute"
+					>
+						<ClockIcon className="h-4 w-4 text-white" />
+					</Button>
+				</div>
+			</Link>
 			<div className="flex flex-col sm:flex-row">
 				<div className="flex-grow sm:w-2/3">
 					<CardHeader className="flex flex-col space-y-1.5">

@@ -340,7 +340,9 @@ export default function NewsMarketSite() {
 							<Card className="bg-gray-800 border-gray-700">
 								<CardHeader>
 									<div className="flex items-center mb-4">
-										<span className="text-2xl font-bold mr-2">NEWS LIVE</span>
+										<span className="text-2xl font-bold text-white mr-2">
+											NEWS LIVE
+										</span>
 										<div
 											className={`w-3 h-3 rounded-full ${
 												isBlinking ? "bg-red-600" : "bg-gray-600"
