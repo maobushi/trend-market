@@ -36,23 +36,23 @@ const Portfolio = () => {
 				const provider = new ethers.providers.Web3Provider(
 					window?.ethereum as any
 				);
-				await provider.send("eth_requestAccounts", []); // ウォレット接続を要求
+				await provider.send("eth_requestAccounts", []); // Request wallet connection
 				const signer = provider.getSigner();
 				const contract = new ethers.Contract(tokenAddress, ERC20_ABI, signer);
 
 				const amount = "100";
 				const tx = await contract.mint(primaryWallet.address, amount);
 				await tx.wait();
-				alert("100 mUSDCが正常にミントされました！");
+				alert("100 mUSDC has been successfully minted!");
 				fetchBalance();
 			} catch (error) {
-				console.error("mUSDCのミントに失敗しました:", error);
+				console.error("Failed to mint mUSDC:", error);
 				alert(
-					"mUSDCのミントに失敗しました。ウォレットが接続されていることを確認してください。"
+					"Failed to mint mUSDC. Please make sure your wallet is connected."
 				);
 			}
 		} else {
-			alert("ウォレットが接続されていません。");
+			alert("Wallet is not connected.");
 		}
 	};
 
@@ -66,10 +66,10 @@ const Portfolio = () => {
 		<div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white">
 			<Header />
 			<div className="container mx-auto p-8">
-				<h1 className="text-4xl font-bold mb-8">ポートフォリオ</h1>
+				<h1 className="text-4xl font-bold mb-8">Portfolio</h1>
 				<div className="flex flex-col md:flex-row gap-8">
 					<div className="flex-1 bg-gray-800 rounded-lg p-6 shadow-lg">
-						<h2 className="text-2xl mb-4">参加中のマーケット</h2>
+						<h2 className="text-2xl mb-4">Participating Markets</h2>
 						<div className="space-y-4">
 							{markets.map((market, index) => (
 								<div
@@ -86,19 +86,19 @@ const Portfolio = () => {
 						</div>
 					</div>
 					<div className="md:w-1/3 bg-gray-800 rounded-lg p-6 shadow-lg">
-						<h2 className="text-2xl mb-4">mUSDC残高</h2>
+						<h2 className="text-2xl mb-4">mUSDC Balance</h2>
 						<p className="text-3xl font-semibold mb-4">{balance} mUSDC</p>
 						<button
 							onClick={claimMUSDC}
 							className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded transition duration-300 transform hover:scale-105 mb-4"
 						>
-							100 mUSDC をClaim
+							Claim 100 mUSDC
 						</button>
 						<button
 							onClick={fetchBalance}
 							className="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition duration-300"
 						>
-							残高を更新
+							Update Balance
 						</button>
 					</div>
 				</div>
