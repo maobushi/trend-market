@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
 	Card,
@@ -21,7 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header/Header";
 // Sample data in JSON format
-const sampleData = {
+export const sampleData = {
 	newsItems: [
 		{
 			id: 1,
@@ -31,6 +31,7 @@ const sampleData = {
 			provider: "TheNewYorkTimes",
 			providerLink:
 				"https://www.nytimes.com/2024/09/19/world/middleeast/israel-lebanon-hezbollah-strikes.html",
+			category: "politics",
 		},
 		{
 			id: 2,
@@ -41,6 +42,7 @@ const sampleData = {
 			provider: "TheNewYorkTimes",
 			providerLink:
 				"https://www.nytimes.com/2024/09/19/us/politics/israel-hezbollah-pager-attacks.html",
+			category: "politics",
 		},
 		{
 			id: 3,
@@ -51,6 +53,7 @@ const sampleData = {
 			provider: "TheNewYorkTimes",
 			providerLink:
 				"https://www.nytimes.com/2024/09/19/us/politics/mark-robinson-north-carolina-gubernatorial-race.html",
+			category: "politics",
 		},
 		{
 			id: 4,
@@ -61,6 +64,7 @@ const sampleData = {
 			provider: "TheNewYorkTimes",
 			providerLink:
 				"https://www.nytimes.com/2024/09/19/us/politics/mark-robinson-cnn-report-presidential-race.html",
+			category: "politics",
 		},
 		{
 			id: 5,
@@ -71,6 +75,7 @@ const sampleData = {
 			provider: "TheNewYorkTimes",
 			providerLink:
 				"https://www.nytimes.com/2024/09/19/us/politics/replace-governor-nominee-north-carolina.html",
+			category: "politics",
 		},
 		{
 			id: 6,
@@ -80,6 +85,7 @@ const sampleData = {
 			provider: "TheNewYorkTimes",
 			providerLink:
 				"https://www.nytimes.com/2024/09/19/us/politics/trump-jews-antisemitism-israel.html",
+			category: "politics",
 		},
 		{
 			id: 7,
@@ -90,6 +96,7 @@ const sampleData = {
 			provider: "TheNewYorkTimes",
 			providerLink:
 				"https://www.nytimes.com/2024/09/19/climate/prehistoric-earth-temperatures.html",
+			category: "science",
 		},
 		{
 			id: 8,
@@ -99,6 +106,7 @@ const sampleData = {
 			provider: "TheNewYorkTimes",
 			providerLink:
 				"https://www.nytimes.com/2024/09/19/business/stock-market-federal-reserve.html",
+			category: "business",
 		},
 		{
 			id: 9,
@@ -108,6 +116,7 @@ const sampleData = {
 			provider: "TheNewYorkTimes",
 			providerLink:
 				"https://www.nytimes.com/2024/09/20/world/europe/europes-new-defense-chief-a-king-without-a-kingdom.html",
+			category: "politics",
 		},
 		{
 			id: 10,
@@ -117,6 +126,7 @@ const sampleData = {
 			provider: "TheNewYorkTimes",
 			providerLink:
 				"https://www.nytimes.com/2024/09/19/us/sheriff-judge-shooting-kentucky.html",
+			category: "politics",
 		},
 		{
 			id: 11,
@@ -126,6 +136,7 @@ const sampleData = {
 			provider: "TheNewYorkTimes",
 			providerLink:
 				"https://www.nytimes.com/2024/09/19/us/politics/migrants-guantanamo-bay-cuba-detention.html",
+			category: "politics",
 		},
 		{
 			id: 12,
@@ -136,6 +147,7 @@ const sampleData = {
 			provider: "TheNewYorkTimes",
 			providerLink:
 				"https://www.nytimes.com/2024/09/19/nyregion/dr-jay-varma-nyc-covid.html",
+			category: "politics",
 		},
 		{
 			id: 13,
@@ -146,6 +158,7 @@ const sampleData = {
 			provider: "TheNewYorkTimes",
 			providerLink:
 				"https://www.nytimes.com/2024/09/19/world/europe/medjugorje-virgin-mary-vatican.html",
+			category: "politics",
 		},
 		{
 			id: 14,
@@ -155,6 +168,7 @@ const sampleData = {
 			provider: "TheNewYorkTimes",
 			providerLink:
 				"https://www.nytimes.com/2024/09/19/opinion/interest-rates-federal-reserve.html",
+			category: "business",
 		},
 		{
 			id: 15,
@@ -163,6 +177,7 @@ const sampleData = {
 			provider: "TheNewYorkTimes",
 			providerLink:
 				"https://www.nytimes.com/2024/09/19/opinion/jd-vance-hillbilly-elegy.html",
+			category: "politics",
 		},
 		{
 			id: 16,
@@ -172,6 +187,7 @@ const sampleData = {
 			provider: "TheNewYorkTimes",
 			providerLink:
 				"https://www.nytimes.com/2024/09/19/opinion/kamala-harris-positions.html",
+			category: "politics",
 		},
 		{
 			id: 17,
@@ -180,6 +196,7 @@ const sampleData = {
 			provider: "TheNewYorkTimes",
 			providerLink:
 				"https://www.nytimes.com/2024/09/18/opinion/darfur-sudan-famine.html",
+			category: "politics",
 		},
 		{
 			id: 18,
@@ -188,6 +205,7 @@ const sampleData = {
 			provider: "TheNewYorkTimes",
 			providerLink:
 				"https://www.nytimes.com/2024/09/19/briefing/lebanon-israel-hezbollah-stocks-harris-trump-guantanamo.html",
+			category: "politics",
 		},
 		{
 			id: 19,
@@ -197,6 +215,7 @@ const sampleData = {
 			provider: "TheNewYorkTimes",
 			providerLink:
 				"https://www.nytimes.com/2024/09/19/business/nike-elliott-hill-john-donahoe.html",
+			category: "business",
 		},
 		{
 			id: 20,
@@ -207,6 +226,7 @@ const sampleData = {
 			provider: "TheNewYorkTimes",
 			providerLink:
 				"https://www.nytimes.com/2024/09/19/us/houston-pipeline-fire-human-remains.html",
+			category: "politics",
 		},
 		{
 			id: 21,
@@ -216,6 +236,7 @@ const sampleData = {
 			provider: "TheNewYorkTimes",
 			providerLink:
 				"https://www.nytimes.com/2024/09/19/us/politics/supreme-court-justices-threats-fbi.html",
+			category: "politics",
 		},
 		{
 			id: 22,
@@ -226,6 +247,7 @@ const sampleData = {
 			provider: "TheNewYorkTimes",
 			providerLink:
 				"https://www.nytimes.com/2024/09/19/us/goon-squad-mississippi-sheriffs-office.html",
+			category: "politics",
 		},
 		{
 			id: 23,
@@ -235,6 +257,155 @@ const sampleData = {
 			provider: "TheNewYorkTimes",
 			providerLink:
 				"https://www.nytimes.com/2024/09/19/books/katherine-rundell-impossible-creatures.html",
+			category: "politics",
+		},
+		{
+			id: 24,
+			title:
+				"Rallying in Two Key States, Harris Presses Her Case on Abortion Rights",
+			description:
+				"Visiting Wisconsin after giving a speech in Georgia, the vice president signaled she would focus on the life-or-death risks of abortion bans in the final weeks of the race.",
+			provider: "TheNewYorkTimes",
+			providerLink:
+				"https://www.nytimes.com/2024/09/20/us/politics/harris-rally-wisconsin.html",
+			category: "politics",
+		},
+		{
+			id: 25,
+			title:
+				"How One Man's Vote in Nebraska Could Change the Presidential Election",
+			description:
+				"A single Republican state senator appears to be holding back a push by Donald J. Trump to net a potentially pivotal electoral vote even before ballots are cast.",
+			provider: "TheNewYorkTimes",
+			providerLink:
+				"https://www.nytimes.com/2024/09/20/us/politics/nebraska-trump-electoral-vote.html",
+			category: "politics",
+		},
+		{
+			id: 26,
+			title: "Early Voting Begins in Minnesota, South Dakota and Virginia",
+			description:
+				"All three states began sending out mail ballots on Friday and now give people the option of voting in person.",
+			provider: "TheNewYorkTimes",
+			providerLink:
+				"https://www.nytimes.com/2024/09/20/us/politics/early-voting-south-dakota-virginia-minnesota.html",
+			category: "politics",
+		},
+		{
+			id: 27,
+			title: "Timeline: What Donald Trump Has Said About Mark Robinson",
+			description:
+				"The former president was an early backer of Mr. Robinson's bid to become governor of North Carolina, a race that was jolted when CNN reported that Mr. Robinson had made disturbing posts online.",
+			provider: "TheNewYorkTimes",
+			providerLink:
+				"https://www.nytimes.com/2024/09/20/us/politics/trump-mark-robinson-relationship.html",
+			category: "politics",
+		},
+		{
+			id: 28,
+			title:
+				"Kamala Harris Tells Oprah if Somebody Breaks Into Her Home, 'They're Getting Shot'",
+			description:
+				"The remarkable utterance underscored Democrats' increasing comfort with the country's gun culture, and how Harris is trying to use it to puncture notions about female candidates.",
+			provider: "TheNewYorkTimes",
+			providerLink:
+				"https://www.nytimes.com/2024/09/20/us/politics/kamala-harris-gun-oprah.html",
+			category: "politics",
+		},
+		{
+			id: 29,
+			title: "Qualcomm Asked Chip Rival Intel if It Would Consider a Sale",
+			description:
+				"While Intel has struggled in recent years, other chipmakers are thriving because of a boom in demand.",
+			provider: "TheNewYorkTimes",
+			providerLink:
+				"https://www.nytimes.com/2024/09/20/technology/qualcomm-intel-talks-sale.html",
+			category: "business",
+		},
+		{
+			id: 30,
+			title: "Now That Rates Are Falling, Let's Turn to Other Matters",
+			description:
+				"The Federal Reserve has at last cut interest rates but our columnist points out a host of concerns that could weigh on financial markets.",
+			provider: "TheNewYorkTimes",
+			providerLink:
+				"https://www.nytimes.com/2024/09/20/business/interest-rates-stock-market-federal-reserve.html",
+			category: "business",
+		},
+		{
+			id: 31,
+			title: "F.T.C. Accuses Drug Middlemen of Inflating Insulin Prices",
+			description:
+				"The case takes aim at the major pharmacy benefit managers, agency officials said, claiming that they favored more expensive insulin products and forced patients to pay more.",
+			provider: "TheNewYorkTimes",
+			providerLink:
+				"https://www.nytimes.com/2024/09/20/health/ftc-drug-price-inflation-insulin.html",
+			category: "business",
+		},
+		{
+			id: 32,
+			title:
+				"Motel 6 Is Sold to Oyo, an Indian Hotel Company Expanding in the U.S.",
+			description:
+				"A roadside chain for more than 50 years, Motel 6 was owned by Blackstone, the private equity giant. Oyo will pay $525 million in an all-cash deal.",
+			provider: "TheNewYorkTimes",
+			providerLink:
+				"https://www.nytimes.com/2024/09/20/business/motel-6-oyo-blackstone.html",
+			category: "business",
+		},
+		{
+			id: 33,
+			title:
+				"Three Mile Island Plans to Reopen as Demand for Nuclear Power Grows",
+			description:
+				"The infamous plant, closed since 2019, is getting a new lease on life after Microsoft agreed to buy its electricity to supply a growing fleet of data centers.",
+			provider: "TheNewYorkTimes",
+			providerLink:
+				"https://www.nytimes.com/2024/09/20/climate/three-mile-island-reopening.html",
+			category: "business",
+		},
+		{
+			id: 34,
+			title: "Foldables Are Becoming Good Enough to Be Your Next Smartphone",
+			description:
+				"New devices from Motorola and Google prove that phones with bendable screens keep getting better — and some are even becoming cheaper.",
+			provider: "TheNewYorkTimes",
+			providerLink:
+				"https://www.nytimes.com/2024/09/18/technology/personaltech/foldable-smartphones.html",
+			category: "technology",
+		},
+		{
+			id: 35,
+			title:
+				"California Passes Election 'Deepfake' Laws, Forcing Social Media Companies to Take Action",
+			description:
+				"The state joins dozens of others in regulating the A.I. fakery in ways that could impact this year's presidential race.",
+			provider: "TheNewYorkTimes",
+			providerLink:
+				"https://www.nytimes.com/2024/09/17/technology/california-deepfakes-law-social-media-newsom.html",
+			category: "technology",
+		},
+		{
+			id: 36,
+			title:
+				"Caroline Ellison, Star Witness in FTX Case, Should Receive Lenient Sentence, Prosecutors Signal",
+			description:
+				"Ms. Ellison, Sam Bankman-Fried's former girlfriend and a top executive in his empire, is set to be sentenced on Sept. 24 for her role in the collapse of the crypto exchange.",
+			provider: "TheNewYorkTimes",
+			providerLink:
+				"https://www.nytimes.com/2024/09/17/technology/caroline-ellison-ftx-sentence.html",
+			category: "technology",
+		},
+		{
+			id: 37,
+			title:
+				"Instagram, Facing Pressure Over Child Safety Online, Unveils Sweeping Changes",
+			description:
+				"The app, which is popular with teenagers, introduced new settings and features aimed at addressing inappropriate online contact and content, and improving sleep for users under 18.",
+			provider: "TheNewYorkTimes",
+			providerLink:
+				"https://www.nytimes.com/2024/09/17/technology/instagram-teens-safety-privacy-changes.html",
+			category: "technology",
 		},
 	],
 	marketItems: [
@@ -276,7 +447,7 @@ const sampleData = {
 			id: 2,
 			title: "2024年末までにS&P500が5000ポイントを超えるか？",
 			description:
-				"連邦準備制度理事会（FRB）の大幅利下げを受け、S&P500が過去最高値を更新。この勢いが続き、2024年12月31日までに S&P500 が 5000 ポイントを超えるかどうかを予測。",
+				"連邦準備制度理事会（FRB）の大幅利下げを受け、S&P500が過去最高値を更新。この勢いが続き、2024年12月31日まで��� S&P500 が 5000 ポイントを超えるかどうかを予測。",
 			category: "経済・金融",
 			deadline: 1735689600,
 			yesPrice: 0.55,
@@ -412,7 +583,7 @@ const sampleData = {
 };
 
 // プロバイダーアイコンのコンポーネント
-const ProviderIcon = ({
+export const ProviderIcon = ({
 	provider,
 	link,
 	iconPath,
@@ -455,11 +626,24 @@ const NewsItem = ({
 	providerLink: string;
 }) => (
 	<Card className="mb-4 bg-gray-800 border-gray-700">
-		<CardHeader className="flex flex-col space-y-1.5">
-			<CardTitle className="text-xl font-bold text-white">{title}</CardTitle>
-			<CardDescription className="text-gray-400">{description}</CardDescription>
+		<CardHeader className="flex flex-row items-start space-y-0 pb-2">
+			<div className="mr-4">
+				<ProviderIcon
+					provider={provider}
+					link={providerLink}
+					iconPath={`/newsprovider/${provider}.png`}
+				/>
+			</div>
+			<div className="flex-1">
+				<CardTitle className="text-xl font-bold text-white mb-2">
+					{title}
+				</CardTitle>
+				<CardDescription className="text-gray-400">
+					{description}
+				</CardDescription>
+			</div>
 		</CardHeader>
-		<CardContent className="flex justify-between items-center">
+		<CardContent className="pt-0 px-4">
 			<a
 				href={providerLink}
 				target="_blank"
@@ -468,121 +652,36 @@ const NewsItem = ({
 			>
 				Source
 			</a>
-			<ProviderIcon
-				provider={provider}
-				link={providerLink}
-				iconPath={`/newsprovider/${provider}.png`}
-			/>
 		</CardContent>
-	</Card>
-);
-
-// マーケット項目のコンポーネント
-const MarketItem = ({
-	title,
-	description,
-	category,
-	deadline,
-	yesPrice,
-	noPrice,
-	providers,
-	oracles,
-}: {
-	title: string;
-	description: string;
-	category: string;
-	deadline: number;
-	yesPrice: number;
-	noPrice: number;
-	providers: { name: string; link: string; iconPath: string }[];
-	oracles: { name: string; link: string; iconPath: string }[];
-}) => (
-	<Card className="mb-6 bg-gray-800 border-gray-700">
-		<div className="flex flex-col sm:flex-row">
-			<div className="flex-grow sm:w-2/3">
-				<CardHeader className="flex flex-col space-y-1.5">
-					<CardTitle className="text-xl font-bold text-white">
-						{title}
-					</CardTitle>
-					<CardDescription className="text-gray-400">
-						{description}
-					</CardDescription>
-				</CardHeader>
-				<CardContent className="py-4">
-					<div className="flex flex-col space-y-2">
-						<div className="flex items-center space-x-2 group relative">
-							<ClockIcon className="w-4 h-4 text-gray-400" />
-							<span className="text-sm text-gray-400">
-								決済時刻: {new Date(deadline * 1000).toLocaleString()}
-							</span>
-							<span className="absolute bottom-full left-0 bg-gray-700 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-								UNIX時間: {deadline}
-							</span>
-						</div>
-						<div className="flex items-center space-x-2">
-							<TagIcon className="w-4 h-4 text-gray-400" />
-							<span className="text-sm text-gray-400">
-								カテゴリ: {category}
-							</span>
-						</div>
-						<div className="flex items-center space-x-2">
-							<UsersIcon className="w-4 h-4 text-gray-400" />
-							<span className="text-sm text-gray-400">参加人数: 1,234</span>
-						</div>
-						<div className="flex items-center space-x-2">
-							<DollarSignIcon className="w-4 h-4 text-gray-400" />
-							<span className="text-sm text-gray-400">Volume: $10,000</span>
-						</div>
-					</div>
-				</CardContent>
-			</div>
-			<div className="flex flex-col justify-between p-4 sm:w-1/3">
-				<div className="flex flex-col space-y-2 mb-4">
-					<Button
-						variant="outline"
-						className="w-full justify-between bg-green-900 hover:bg-green-800 border-green-700 text-white font-bold"
-					>
-						Yes{" "}
-						<span className="ml-1 text-green-400">${yesPrice.toFixed(2)}</span>
-					</Button>
-					<Button
-						variant="outline"
-						className="w-full justify-between bg-red-900 hover:bg-red-800 border-red-700 text-white font-bold"
-					>
-						No <span className="ml-1 text-red-400">${noPrice.toFixed(2)}</span>
-					</Button>
-				</div>
-				<div className="flex flex-col space-y-2">
-					<div className="flex flex-wrap gap-1">
-						<span className="text-sm text-gray-400 mr-2">News Provider:</span>
-						{providers.map((provider, index) => (
-							<ProviderIcon
-								key={`provider-${index}`}
-								provider={provider.name}
-								link={provider.link}
-								iconPath={provider.iconPath}
-							/>
-						))}
-					</div>
-					<div className="flex flex-wrap gap-1">
-						<span className="text-sm text-gray-400 mr-2">Oracle:</span>
-						{oracles.map((oracle, index) => (
-							<ProviderIcon
-								key={`oracle-${index}`}
-								provider={oracle.name}
-								link={oracle.link}
-								iconPath={oracle.iconPath}
-							/>
-						))}
-					</div>
-				</div>
-			</div>
-		</div>
 	</Card>
 );
 
 export default function NewsMarketSite() {
 	const [activeTab, setActiveTab] = useState("news");
+	const [activeNewsCategory, setActiveNewsCategory] = useState("all");
+	const [isBlinking, setIsBlinking] = useState(true);
+
+	useEffect(() => {
+		const blinkInterval = setInterval(() => {
+			setIsBlinking((prev) => !prev);
+		}, 1000);
+
+		return () => clearInterval(blinkInterval);
+	}, []);
+
+	const newsCategories = [
+		{ value: "all", label: "すべて", icon: NewspaperIcon },
+		{ value: "politics", label: "政治", icon: UsersIcon },
+		{ value: "business", label: "ビジネス", icon: DollarSignIcon },
+		{ value: "technology", label: "テクノロジー", icon: TagIcon },
+	];
+
+	const filteredNews =
+		activeNewsCategory === "all"
+			? sampleData.newsItems
+			: sampleData.newsItems.filter(
+					(item) => item.category === activeNewsCategory
+			  );
 
 	return (
 		<>
@@ -593,73 +692,50 @@ export default function NewsMarketSite() {
 						onValueChange={setActiveTab}
 						className="w-full"
 					>
-						<TabsList className="grid w-full grid-cols-2 mb-8 bg-gray-800 text-white font-bold py-0">
-							<TabsTrigger
-								value="news"
-								className="flex items-center text-lg data-[state=active]:bg-gray-700"
-							>
-								<NewspaperIcon className="w-5 h-5 mr-2 text-white font-bold" />
-								<span className="text-white font-bold">News</span>
-							</TabsTrigger>
-							<TabsTrigger
-								value="markets"
-								className="flex items-center text-lg data-[state=active]:bg-gray-700"
-							>
-								<BarChartIcon className="w-5 h-5 mr-2 text-white font-bold" />
-								<span className="text-white font-bold">Markets</span>
-							</TabsTrigger>
-						</TabsList>
 						<TabsContent value="news">
 							<Card className="bg-gray-800 border-gray-700">
 								<CardHeader>
-									<CardTitle className="text-2xl text-white font-bold">
-										Latest News
-									</CardTitle>
+									<div className="flex items-center mb-4">
+										<span className="text-2xl font-bold mr-2">NEWS LIVE</span>
+										<div
+											className={`w-3 h-3 rounded-full ${
+												isBlinking ? "bg-red-600" : "bg-gray-600"
+											} transition-colors duration-300`}
+										></div>
+									</div>
 									<CardDescription className="text-gray-400">
-										Stay informed with the most recent updates
+										Latest news
 									</CardDescription>
 								</CardHeader>
 								<CardContent>
-									<ScrollArea className="h-[600px] pr-4">
-										{sampleData.newsItems.map((item) => (
-											<NewsItem
-												key={item.id}
-												title={item.title}
-												description={item.description}
-												provider={item.provider}
-												providerLink={item.providerLink}
-											/>
-										))}
-									</ScrollArea>
-								</CardContent>
-							</Card>
-						</TabsContent>
-						<TabsContent value="markets">
-							<Card className="bg-gray-800 border-gray-700">
-								<CardHeader>
-									<CardTitle className="text-2xl font-bold text-white">
-										Prediction Markets
-									</CardTitle>
-									<CardDescription className="text-gray-400">
-										Explore and bet on future outcomes
-									</CardDescription>
-								</CardHeader>
-								<CardContent>
-									<ScrollArea className="h-[600px] pr-4">
-										{sampleData.marketItems.map((item) => (
-											<MarketItem
-												key={item.id}
-												title={item.title}
-												description={item.description}
-												category={item.category}
-												deadline={item.deadline}
-												yesPrice={item.yesPrice}
-												noPrice={item.noPrice}
-												providers={item.providers}
-												oracles={item.oracles}
-											/>
-										))}
-									</ScrollArea>
+									<Tabs
+										value={activeNewsCategory}
+										onValueChange={setActiveNewsCategory}
+									>
+										<TabsList className="grid w-full grid-cols-4 mb-4 bg-gray-700">
+											{newsCategories.map((category) => (
+												<TabsTrigger
+													key={category.value}
+													value={category.value}
+													className="flex items-center text-sm data-[state=active]:bg-gray-600"
+												>
+													<category.icon className="w-4 h-4 mr-2" />
+													<span>{category.label}</span>
+												</TabsTrigger>
+											))}
+										</TabsList>
+										<ScrollArea className="h-[600px] pr-4">
+											{filteredNews.map((item) => (
+												<NewsItem
+													key={item.id}
+													title={item.title}
+													description={item.description}
+													provider={item.provider}
+													providerLink={item.providerLink}
+												/>
+											))}
+										</ScrollArea>
+									</Tabs>
 								</CardContent>
 							</Card>
 						</TabsContent>

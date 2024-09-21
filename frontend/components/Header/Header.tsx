@@ -36,6 +36,18 @@ const Header = () => {
 				</Link>
 				<nav className="flex items-center space-x-6">
 					<a
+						href="/"
+						className="hover:text-blue-400 transition-colors font-bold"
+					>
+						News
+					</a>
+					<a
+						href="/market"
+						className="hover:text-blue-400 transition-colors font-bold"
+					>
+						Market
+					</a>
+					<a
 						href="/portfolio"
 						className="hover:text-blue-400 transition-colors font-bold"
 					>
